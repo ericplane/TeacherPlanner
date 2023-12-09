@@ -1,8 +1,10 @@
+import Data.SchoolClassManager;
 import Panels.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
 
 public class HomeInterface {
 
@@ -17,17 +19,18 @@ public class HomeInterface {
         panel.setSize(window.getSize());
         panel.setLayout(new BorderLayout());
 
-        ManageClasses manageClasses = new ManageClasses(panel);
+        SchoolClassManager schoolClassManager = new SchoolClassManager();
 
-        JComboBox<String> classDropdown = new JComboBox<String>();
+        JComboBox<String> classDropdown = new JComboBox<>();
         classDropdown.setPrototypeDisplayValue("Select Class");
 
         JTabbedPane frame = new JTabbedPane();
 
-        Attendance attendance = new Attendance(panel);
+        Attendance attendance = new Attendance(panel, schoolClassManager);
         Grading grading = new Grading(panel);
         Activity activity = new Activity(panel);
         Analytics analytics = new Analytics(panel);
+        ManageClasses manageClasses = new ManageClasses(panel, schoolClassManager);
 
         frame.addTab("Attendance", attendance.create());
         frame.addTab("Grading", grading.create());
@@ -35,30 +38,39 @@ public class HomeInterface {
         frame.addTab("Analytics", analytics.create());
         frame.addTab("Manage Classes", manageClasses.create());
 
-        DefaultComboBoxModel<String> classModel = new DefaultComboBoxModel<>(manageClasses.classNames);
+        DefaultComboBoxModel<String> classModel = new DefaultComboBoxModel<>(schoolClassManager.getSchoolClassNames());
         classDropdown.setModel(classModel);
 
-        classDropdown.addFocusListener(new FocusListener() {
+        if (classDropdown.getSelectedIndex() == 0 && classDropdown.getItemCount() > 0) {
+            schoolClassManager.setSelectedClassIndex(0);
+        }
+
+        classDropdown.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent focusEvent) {
                 int numberOfClasses = classDropdown.getItemCount();
+                String[] classNames = schoolClassManager.getSchoolClassNames();
 
-                if (manageClasses.classNames.length != numberOfClasses) {
-                    String selectedItem = classDropdown.getSelectedItem().toString();
-                    classDropdown.setModel(new DefaultComboBoxModel<>(manageClasses.classNames));
+                if (classNames.length != numberOfClasses) {
+                    String selectedItem = (String) classDropdown.getSelectedItem();
+                    classDropdown.removeAllItems();
+                    classDropdown.setModel(new DefaultComboBoxModel<>(classNames));
 
                     for (int i = 0; i < classDropdown.getItemCount(); i++) {
-                        if(classDropdown.getItemAt(i).toString() == selectedItem) {
+                        if(Objects.equals(classDropdown.getItemAt(i), selectedItem)) {
                             classDropdown.setSelectedIndex(i);
                             break;
                         }
                     }
+
+                    classDropdown.showPopup();
+
+                    if (classNames.length == 0) updateTabs(frame, false);
+                    if (classNames.length == 1) {
+                        updateTabs(frame, true);
+                        schoolClassManager.setSelectedClassIndex(classDropdown.getSelectedIndex());
+                    }
                 }
-            }
-
-            @Override
-            public void focusLost(FocusEvent focusEvent) {
-
             }
         });
 
@@ -67,18 +79,15 @@ public class HomeInterface {
             frame.setSelectedIndex(4);
         }
 
-        classDropdown.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                String selectedClass = itemEvent.getItem().toString();
+        classDropdown.addItemListener(itemEvent -> {
+            String selectedClass = itemEvent.getItem().toString();
 
-                if (selectedClass != null && !selectedClass.equals("")) {
-                    updateTabs(frame, true);
-                    manageClasses.selectedClassIndex = classDropdown.getSelectedIndex();
-                    manageClasses.updateTable();
-                } else {
-                    manageClasses.selectedClassIndex = -1;
-                }
+            if (selectedClass != null && !selectedClass.isEmpty()) {
+                updateTabs(frame, true);
+                schoolClassManager.setSelectedClassIndex(classDropdown.getSelectedIndex());
+            } else {
+                schoolClassManager.setSelectedClassIndex(-1);
+                updateTabs(frame, false);
             }
         });
 

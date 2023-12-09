@@ -2,15 +2,14 @@ package Classes;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.YearMonth;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class DatePicker extends JPanel {
+    private final List<DateChangeListener> dateChangeListeners = new ArrayList<>();
     private final JComboBox<String> dayDropdown;
     private final JComboBox<String> monthDropdown;
     private final JComboBox<String> yearDropdown;
@@ -29,19 +28,9 @@ public class DatePicker extends JPanel {
             yearDropdown.addItem(String.valueOf(i));
         }
 
-        monthDropdown.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateDayDropdown();
-            }
-        });
+        monthDropdown.addActionListener(e -> updateDayDropdown());
 
-        yearDropdown.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateDayDropdown();
-            }
-        });
+        yearDropdown.addActionListener(e -> updateDayDropdown());
 
         this.add(dayDropdown);
         this.add(monthDropdown);
@@ -55,12 +44,23 @@ public class DatePicker extends JPanel {
         updateDayDropdown();
 
         dayDropdown.setSelectedItem(String.valueOf(currentDate.getDayOfMonth()));
+
+        yearDropdown.addItemListener(e -> notifyDateChangeListeners());
+        monthDropdown.addItemListener(e -> notifyDateChangeListeners());
+        dayDropdown.addItemListener(e -> notifyDateChangeListeners());
     }
 
     private void updateDayDropdown() {
+        LocalDate currentDate = LocalDate.now();
         int selectedMonth = Integer.parseInt((String) Objects.requireNonNull(monthDropdown.getSelectedItem()));
+        int currentMonth = currentDate.getMonthValue();
         int selectedYear = Integer.parseInt((String) Objects.requireNonNull(yearDropdown.getSelectedItem()));
+        int currentYear = currentDate.getYear();
         int maxDay = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth();
+
+        if (selectedYear == currentYear && selectedMonth == currentMonth) {
+            maxDay = currentDate.getDayOfMonth();
+        }
 
         dayDropdown.removeAllItems();
         for (int i = 1; i <= maxDay; i++) {
@@ -74,5 +74,16 @@ public class DatePicker extends JPanel {
         String year = (String) yearDropdown.getSelectedItem();
 
         return day + "/" + month + "/" + year;
+    }
+
+    public void addDateChangeListener(DateChangeListener listener) {
+        dateChangeListeners.add(listener);
+    }
+
+    private void notifyDateChangeListeners() {
+        String selectedDate = getSelectedDate();
+        for (DateChangeListener listener : dateChangeListeners) {
+            listener.onDateChange(selectedDate);
+        }
     }
 }
