@@ -67,6 +67,8 @@ public class Attendance {
 
                 if (data != Presence.ABSENT) {
                     schoolClass.students[row].absences.remove(date);
+                } else {
+                    schoolClass.students[row].absences.put(date, "Unexcused");
                 }
             } else {
                 // Reason Update

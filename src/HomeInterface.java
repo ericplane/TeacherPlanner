@@ -27,7 +27,7 @@ public class HomeInterface {
         JTabbedPane frame = new JTabbedPane();
 
         Attendance attendance = new Attendance(panel, schoolClassManager);
-        Grading grading = new Grading(panel);
+        Grading grading = new Grading(panel, schoolClassManager);
         Activity activity = new Activity(panel);
         Analytics analytics = new Analytics(panel);
         ManageClasses manageClasses = new ManageClasses(panel, schoolClassManager);

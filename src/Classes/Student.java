@@ -10,7 +10,8 @@ public class Student implements Serializable {
     public String name;
     public String dateOfBirth;
     public Gender gender;
-    public Integer[] grades;
+    public Hashtable<String, Integer> grades = new Hashtable<>();
+    public Hashtable<String, String> gradesComments = new Hashtable<>();
     public Hashtable<String, Presence> presence = new Hashtable<>();
     public Hashtable<String, String> absences = new Hashtable<>();
 
