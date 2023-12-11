@@ -21,8 +21,13 @@ public class HomeInterface {
 
         SchoolClassManager schoolClassManager = new SchoolClassManager();
 
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout());
+
         JComboBox<String> classDropdown = new JComboBox<>();
-        classDropdown.setPrototypeDisplayValue("Select Class");
+        classDropdown.setToolTipText("Selected Class");
+
+        JButton logoutButton = new JButton("Logout");
 
         JTabbedPane frame = new JTabbedPane();
 
@@ -91,7 +96,10 @@ public class HomeInterface {
             }
         });
 
-        panel.add(classDropdown, BorderLayout.NORTH);
+        topPanel.add(classDropdown, BorderLayout.CENTER);
+        topPanel.add(logoutButton, BorderLayout.LINE_END);
+
+        panel.add(topPanel, BorderLayout.NORTH);
         panel.add(frame, BorderLayout.CENTER);
 
         panel.setVisible(true);

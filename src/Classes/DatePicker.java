@@ -19,6 +19,10 @@ public class DatePicker extends JPanel {
         monthDropdown = new JComboBox<>();
         yearDropdown = new JComboBox<>();
 
+        dayDropdown.setToolTipText("Day");
+        monthDropdown.setToolTipText("Month");
+        yearDropdown.setToolTipText("Year");
+
         for (int i = 1; i <= 12; i++) {
             monthDropdown.addItem(String.valueOf(i));
         }
