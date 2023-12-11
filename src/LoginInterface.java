@@ -9,8 +9,10 @@ public class LoginInterface {
         this.window = window;
     }
 
-    public void create() {
+    public void create(JPanel homePanel) {
         JDialog popup = new JDialog(window, "Login", Dialog.ModalityType.APPLICATION_MODAL);
+
+        homePanel.setVisible(false);
 
         JPanel panel = new JPanel();
         // Add login components to the panel
@@ -36,12 +38,7 @@ public class LoginInterface {
             }
         });
 
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                registerLogin(popup, usernameField, passwordField);
-            }
-        });
+        loginButton.addActionListener(actionEvent -> registerLogin(popup, usernameField, passwordField, homePanel));
 
         usernameField.addKeyListener(new KeyListener() {
             @Override
@@ -52,7 +49,7 @@ public class LoginInterface {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-                    registerLogin(popup, usernameField, passwordField);
+                    registerLogin(popup, usernameField, passwordField, homePanel);
                 }
             }
 
@@ -62,22 +59,13 @@ public class LoginInterface {
             }
         });
 
-        passwordField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) {
-
-            }
+        passwordField.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-                    registerLogin(popup, usernameField, passwordField);
+                    registerLogin(popup, usernameField, passwordField, homePanel);
                 }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-
             }
         });
 
@@ -88,12 +76,13 @@ public class LoginInterface {
         popup.setVisible(true);
     }
 
-    private void registerLogin(JDialog popup, JTextField usernameField, JPasswordField passwordField) {
+    private void registerLogin(JDialog popup, JTextField usernameField, JPasswordField passwordField, JPanel homePanel) {
         if (usernameField.getText().equals("Alex Thompson")) {
             char[] enteredPassword = passwordField.getPassword();
             char[] correctPassword = "gamble".toCharArray();
             if (Arrays.equals(enteredPassword, correctPassword)) {
                 // Password is correct
+                homePanel.setVisible(true);
                 popup.dispose();
             } else {
                 // Incorrect password

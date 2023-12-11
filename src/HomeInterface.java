@@ -9,9 +9,11 @@ import java.util.Objects;
 public class HomeInterface {
 
     JFrame window;
+    LoginInterface loginInterface;
 
-    public HomeInterface(JFrame window) {
+    public HomeInterface(JFrame window, LoginInterface loginInterface) {
         this.window = window;
+        this.loginInterface = loginInterface;
     }
 
     public void create() {
@@ -96,16 +98,18 @@ public class HomeInterface {
             }
         });
 
+        logoutButton.addActionListener(actionEvent -> loginInterface.create(panel));
+
         topPanel.add(classDropdown, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.LINE_END);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(frame, BorderLayout.CENTER);
 
-        panel.setVisible(true);
-
         window.add(panel);
         window.setVisible(true);
+
+        loginInterface.create(panel);
     }
 
     private void updateTabs(JTabbedPane frame, boolean enabled) {

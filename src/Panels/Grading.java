@@ -6,7 +6,9 @@ import Data.SchoolClassManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.util.regex.Pattern;
 
 public class Grading {
     SchoolClassManager schoolClassManager;
@@ -27,11 +29,31 @@ public class Grading {
         panel.setLayout(new BorderLayout());
 
         JPanel selectionPanel = new JPanel();
-        selectionPanel.setLayout(new FlowLayout());
+        selectionPanel.setLayout(new BorderLayout());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        JComboBox<String> assignmentDropdown = new JComboBox<>();
+
+        JButton createAssignment = new JButton("Create Assignment");
+        JButton deleteAssignment = new JButton("Delete Selected Assignment");
 
         JTable gradeTable = new JTable(tableModel);
 
+        TableColumn gradeColumn = gradeTable.getColumnModel().getColumn(1);
+        gradeColumn.setCellEditor(new DefaultCellEditor(new JComboBox<Integer>(new Integer[]{0,1,2,3,4,5,6,7})));
+
+        TableColumn commentColumn = gradeTable.getColumnModel().getColumn(2);
+
+
         schoolClassManager.addSchoolClassChangeListener(this::updateTable);
+
+        buttonPanel.add(createAssignment);
+        buttonPanel.add(deleteAssignment);
+
+        selectionPanel.add(assignmentDropdown, BorderLayout.CENTER);
+        selectionPanel.add(buttonPanel, BorderLayout.LINE_END);
 
         panel.add(selectionPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(gradeTable), BorderLayout.CENTER);

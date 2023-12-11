@@ -19,10 +19,9 @@ public class Main {
 
         // Login System
         LoginInterface loginInterface = new LoginInterface(window);
-        loginInterface.create();
 
         // Home Interface
-        HomeInterface homeInterface = new HomeInterface(window);
+        HomeInterface homeInterface = new HomeInterface(window, loginInterface);
         homeInterface.create();
     }
 
