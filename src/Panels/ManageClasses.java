@@ -161,7 +161,7 @@ public class ManageClasses {
         JLabel genderLabel = new JLabel("Gender: ");
         JComboBox<Gender> genderField = new JComboBox<>(Gender.values());
         JLabel dateLabel = new JLabel("Date of Birth: ");
-        DatePicker datePicker = new DatePicker();
+        DatePicker datePicker = new DatePicker(false);
         JButton createButton = new JButton("Add Student");
 
         panel.add(nameLabel);

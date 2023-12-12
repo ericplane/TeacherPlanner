@@ -33,7 +33,7 @@ public class Attendance {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        datePicker = new DatePicker();
+        datePicker = new DatePicker(false);
         JTable attendanceTable = new JTable(tableModel);
 
         TableColumn presenceColumn = attendanceTable.getColumnModel().getColumn(1);

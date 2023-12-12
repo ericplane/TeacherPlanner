@@ -14,7 +14,7 @@ public class DatePicker extends JPanel {
     private final JComboBox<String> monthDropdown;
     private final JComboBox<String> yearDropdown;
 
-    public DatePicker() {
+    public DatePicker(boolean isFuture) {
         dayDropdown = new JComboBox<>();
         monthDropdown = new JComboBox<>();
         yearDropdown = new JComboBox<>();
@@ -28,13 +28,19 @@ public class DatePicker extends JPanel {
         }
 
         int currentYear = LocalDate.now().getYear();
-        for (int i = currentYear; i >= 1900; i--) {
-            yearDropdown.addItem(String.valueOf(i));
+        if (!isFuture) {
+            for (int i = currentYear; i >= 1900; i--) {
+                yearDropdown.addItem(String.valueOf(i));
+            }
+        } else {
+            for (int i = currentYear; i <= currentYear + 2; i++) {
+                yearDropdown.addItem(String.valueOf(i));
+            }
         }
 
-        monthDropdown.addActionListener(e -> updateDayDropdown());
+        monthDropdown.addActionListener(e -> updateDayDropdown(isFuture));
 
-        yearDropdown.addActionListener(e -> updateDayDropdown());
+        yearDropdown.addActionListener(e -> updateDayDropdown(isFuture));
 
         this.add(dayDropdown);
         this.add(monthDropdown);
@@ -45,7 +51,7 @@ public class DatePicker extends JPanel {
         yearDropdown.setSelectedItem(String.valueOf(currentDate.getYear()));
         monthDropdown.setSelectedItem(String.valueOf(currentDate.getMonthValue()));
 
-        updateDayDropdown();
+        updateDayDropdown(isFuture);
 
         dayDropdown.setSelectedItem(String.valueOf(currentDate.getDayOfMonth()));
 
@@ -54,7 +60,7 @@ public class DatePicker extends JPanel {
         dayDropdown.addItemListener(e -> notifyDateChangeListeners());
     }
 
-    private void updateDayDropdown() {
+    private void updateDayDropdown(boolean isFuture) {
         LocalDate currentDate = LocalDate.now();
         int selectedMonth = Integer.parseInt((String) Objects.requireNonNull(monthDropdown.getSelectedItem()));
         int currentMonth = currentDate.getMonthValue();
@@ -62,7 +68,7 @@ public class DatePicker extends JPanel {
         int currentYear = currentDate.getYear();
         int maxDay = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth();
 
-        if (selectedYear == currentYear && selectedMonth == currentMonth) {
+        if (selectedYear == currentYear && selectedMonth == currentMonth && !isFuture) {
             maxDay = currentDate.getDayOfMonth();
         }
 

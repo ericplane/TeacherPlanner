@@ -7,6 +7,8 @@ public class SchoolClass implements Serializable {
 
     public String className;
 
+    public String[] assignments;
+
     public SchoolClass(String className) {
         this.className = className;
     }

@@ -35,13 +35,11 @@ public class HomeInterface {
 
         Attendance attendance = new Attendance(panel, schoolClassManager);
         Grading grading = new Grading(panel, schoolClassManager);
-        Activity activity = new Activity(panel);
         Analytics analytics = new Analytics(panel);
         ManageClasses manageClasses = new ManageClasses(panel, schoolClassManager);
 
         frame.addTab("Attendance", attendance.create());
         frame.addTab("Grading", grading.create());
-        frame.addTab("Activity", activity.create());
         frame.addTab("Analytics", analytics.create());
         frame.addTab("Manage Classes", manageClasses.create());
 
@@ -83,7 +81,7 @@ public class HomeInterface {
 
         if (classDropdown.getSelectedItem() == null) {
             updateTabs(frame, false);
-            frame.setSelectedIndex(4);
+            frame.setSelectedIndex(3);
         }
 
         classDropdown.addItemListener(itemEvent -> {
@@ -116,6 +114,5 @@ public class HomeInterface {
         frame.setEnabledAt(0, enabled);
         frame.setEnabledAt(1, enabled);
         frame.setEnabledAt(2, enabled);
-        frame.setEnabledAt(3, enabled);
     }
 }
