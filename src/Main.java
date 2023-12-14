@@ -9,7 +9,7 @@ public class Main {
         int windowHeight = 700;
 
         JFrame window = new JFrame("Teacher Planner");
-        window.setResizable(false);
+        window.setResizable(true);
         window.setSize(windowWidth, windowHeight);
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
