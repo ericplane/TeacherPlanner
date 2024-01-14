@@ -11,13 +11,14 @@ public class PieChart extends JPanel {
 
     public PieChart(Hashtable<String, Integer> data) {
         this.data = data;
-        this.setLayout(new BorderLayout()); // Set the layout manager
+        this.setLayout(new BorderLayout());
         this.setSize(400, 400);
         this.setPreferredSize(new Dimension(400,400));
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
+                setToolTipText(null);
                 int x = e.getX();
                 int y = e.getY();
                 String section = getSectionAt(x, y);
@@ -26,8 +27,6 @@ public class PieChart extends JPanel {
                     double percentage = (double) value / 360 * 100;
                     String tooltip = section + ": " + String.format("%.2f", percentage) + "%";
                     setToolTipText(tooltip);
-                } else {
-                    setToolTipText(null);
                 }
             }
         });
@@ -45,10 +44,20 @@ public class PieChart extends JPanel {
 
         for (String category : data.keySet()) {
             int value = data.get(category);
-            g.setColor(getRandomColor());
+            switch (category) {
+                case "Present" -> g.setColor(Color.GREEN);
+                case "Late" -> g.setColor(Color.ORANGE);
+                case "Absent" -> g.setColor(Color.RED);
+            }
             g.fillArc(x, y, chartDiameter, chartDiameter, startAngle, value);
             startAngle += value;
         }
+    }
+
+    public void updateData(Hashtable<String, Integer> newData) {
+        this.data.clear();
+        this.data.putAll(newData);
+        repaint();
     }
 
     private int getTotalValue() {
@@ -66,35 +75,31 @@ public class PieChart extends JPanel {
     private String getSectionAt(int x, int y) {
         double angle = getAngle(x, y);
 
-        // Calculate the section based on the angle
         double total = getTotalValue();
         double currentAngle = 0;
         for (String category : data.keySet()) {
             int value = data.get(category);
-            double arcAngle = (360.0 * value / total) * (Math.PI / 180); // Convert degrees to radians
+            double arcAngle = (360.0 * value / total) * (Math.PI / 180);
             if (angle >= currentAngle && angle < currentAngle + arcAngle) {
                 return category;
             }
             currentAngle += arcAngle;
         }
 
-        return null; // No section found at the specified angle
+        return null;
     }
 
     private double getAngle(int x, int y) {
         int width = getWidth();
         int height = getHeight();
-        int chartDiameter = Math.min(width, height) - 100;
         int centerX = width / 2;
         int centerY = height / 2;
 
-        // Adjust x and y relative to the center of the pie chart
         int adjustedX = x - centerX;
-        int adjustedY = centerY - y; // Reverse the y-axis
+        int adjustedY = centerY - y;
 
-        // Calculate the angle in radians
         double angle = Math.atan2(adjustedY, adjustedX);
-        angle = (angle < 0) ? (2 * Math.PI + angle) : angle; // Convert negative angles to positive
+        angle = (angle < 0) ? (2 * Math.PI + angle) : angle;
         return angle;
     }
 }

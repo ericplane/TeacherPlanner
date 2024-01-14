@@ -35,7 +35,7 @@ public class HomeInterface {
 
         Attendance attendance = new Attendance(panel, schoolClassManager);
         Grading grading = new Grading(panel, schoolClassManager);
-        Analytics analytics = new Analytics(panel);
+        Analytics analytics = new Analytics(panel, schoolClassManager);
         ManageClasses manageClasses = new ManageClasses(panel, schoolClassManager);
 
         frame.addTab("Attendance", attendance.create());
