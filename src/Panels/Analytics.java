@@ -134,8 +134,6 @@ public class Analytics {
 
             int index = studentIndexMap.get(selectedStudent);
 
-            System.out.println(selectedStudent);
-
             updatePieChart(index, pieChart, totalAttendanceLabel);
             updateLineChart(index, lineChart, predicatedGradesLabel);
             return;
