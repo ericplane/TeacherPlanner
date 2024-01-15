@@ -5,13 +5,10 @@ import Classes.PieChart;
 import Classes.Student;
 import Data.SchoolClassManager;
 import Enums.Presence;
-import com.sun.source.tree.Tree;
 
-import javax.sound.sampled.Line;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -141,6 +138,7 @@ public class Analytics {
 
             updatePieChart(index, pieChart, totalAttendanceLabel);
             updateLineChart(index, lineChart, predicatedGradesLabel);
+            return;
         }
 
         updatePieChart(999, pieChart, totalAttendanceLabel);
@@ -229,7 +227,7 @@ public class Analytics {
 
             Map<Date, List<Integer>> assignmentGrades = new HashMap<>();
 
-            for (Student student : schoolClassManager.getSchoolClass().students) {
+            for (Student student : students) {
                 for (String assignment : student.grades.keySet()) {
                     try {
                         String dateString = assignment.substring(assignment.indexOf("(") + 1, assignment.indexOf(")"));
@@ -260,10 +258,8 @@ public class Analytics {
                 meanGradesData.put(date, meanGrade);
             }
 
-            // Update the line chart with the calculated mean grades
             lineChart.updateData(meanGradesData);
 
-            // Calculate the predicted grades based on the mean grades
             int totalMeanGrades = meanGradesData.values().stream().mapToInt(Integer::intValue).sum();
             double predictedGrades = (totalMeanGrades / (meanGradesData.size() * 7.0));
             predicatedGradesLabel.setText("Predicted Grades: " + (int) (predictedGrades * 7));

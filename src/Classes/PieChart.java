@@ -68,10 +68,6 @@ public class PieChart extends JPanel {
         return total;
     }
 
-    private Color getRandomColor() {
-        return new Color((int) (Math.random() * 0x1000000));
-    }
-
     private String getSectionAt(int x, int y) {
         double angle = getAngle(x, y);
 
