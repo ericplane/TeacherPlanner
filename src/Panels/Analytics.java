@@ -196,7 +196,7 @@ public class Analytics {
             }
         }
 
-        if (calculateAttendance(pieChart, totalAttendanceLabel, presentCount, lateCount, absentCount)) return;
+        calculateAttendance(pieChart, totalAttendanceLabel, presentCount, lateCount, absentCount);
     }
 
     private boolean calculateAttendance(PieChart pieChart, JLabel totalAttendanceLabel, int presentCount, int lateCount, int absentCount) {
@@ -244,7 +244,7 @@ public class Analytics {
                         }
                     } catch (ParseException e) {
                         System.out.println("Error: Failed to parse date for assignment: " + assignment);
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -284,7 +284,7 @@ public class Analytics {
                 }
             } catch (ParseException e) {
                 System.out.println("Error: Failed to parse date for assignment: " + assignment);
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
 
