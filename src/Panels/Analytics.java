@@ -125,6 +125,9 @@ public class Analytics {
     }
 
     private void updateCharts(String selectedStudent, PieChart pieChart, JLabel totalAttendanceLabel, LineChart lineChart, JLabel predicatedGradesLabel) {
+        if (schoolClassManager.getSchoolClass() == null) return;
+        if (schoolClassManager.getSchoolClass().students == null) return;
+
         if (!selectedStudent.equals("Whole Class")) {
             String[] students = Objects.requireNonNull(getStudentNames()).toArray(new String[0]);
             Map<String, Integer> studentIndexMap = new HashMap<>();
@@ -133,6 +136,8 @@ public class Analytics {
             }
 
             int index = studentIndexMap.get(selectedStudent);
+
+            System.out.println(selectedStudent);
 
             updatePieChart(index, pieChart, totalAttendanceLabel);
             updateLineChart(index, lineChart, predicatedGradesLabel);
@@ -144,7 +149,32 @@ public class Analytics {
 
     private void updatePieChart(int studentIndex, PieChart pieChart, JLabel totalAttendanceLabel) {
         if (studentIndex == 999) {
-         return;
+            Student[] students = schoolClassManager.getSchoolClass().students;
+
+            int presentCount = 0;
+            int lateCount = 0;
+            int absentCount = 0;
+
+            for (Student student : students) {
+                Hashtable<String, Presence> presenceData = student.presence;
+
+                for (Presence presence : presenceData.values()) {
+                    switch (presence) {
+                        case PRESENT:
+                            presentCount++;
+                            break;
+                        case LATE:
+                            lateCount++;
+                            break;
+                        case ABSENT:
+                            absentCount++;
+                            break;
+                    }
+                }
+            }
+
+            if (calculateAttendance(pieChart, totalAttendanceLabel, presentCount, lateCount, absentCount)) return;
+            return;
         }
 
         Student student = schoolClassManager.getSchoolClass().students[studentIndex];
@@ -168,9 +198,13 @@ public class Analytics {
             }
         }
 
+        if (calculateAttendance(pieChart, totalAttendanceLabel, presentCount, lateCount, absentCount)) return;
+    }
+
+    private boolean calculateAttendance(PieChart pieChart, JLabel totalAttendanceLabel, int presentCount, int lateCount, int absentCount) {
         double total = presentCount + lateCount + absentCount;
 
-        if (total == 0) return;
+        if (total == 0) return true;
 
         double presentPercentage = (presentCount / total) * 360;
         double latePercentage = (lateCount / total) * 360;
@@ -184,10 +218,56 @@ public class Analytics {
 
         double totalAttendance = (presentCount + lateCount) / total;
         totalAttendanceLabel.setText("Total Attendance: " + (int) (totalAttendance * 100) + "%");
+        return false;
     }
 
     private void updateLineChart(int studentIndex, LineChart lineChart, JLabel predicatedGradesLabel) {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
         if (studentIndex == 999) {
+            Student[] students = schoolClassManager.getSchoolClass().students;
+
+            Map<Date, List<Integer>> assignmentGrades = new HashMap<>();
+
+            for (Student student : schoolClassManager.getSchoolClass().students) {
+                for (String assignment : student.grades.keySet()) {
+                    try {
+                        String dateString = assignment.substring(assignment.indexOf("(") + 1, assignment.indexOf(")"));
+                        Date date = dateFormat.parse(dateString);
+                        int grade = student.grades.get(assignment);
+
+                        // Update the assignmentGrades map with the total grade and count for each assignment
+                        if (assignmentGrades.containsKey(date)) {
+                            assignmentGrades.get(date).add(grade);
+                        } else {
+                            List<Integer> grades = new ArrayList<>();
+                            grades.add(grade);
+                            assignmentGrades.put(date, grades);
+                        }
+                    } catch (ParseException e) {
+                        System.out.println("Error: Failed to parse date for assignment: " + assignment);
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            // Calculate the mean grade for each assignment
+            TreeMap<Date, Integer> meanGradesData = new TreeMap<>();
+            for (Date date : assignmentGrades.keySet()) {
+                List<Integer> grades = assignmentGrades.get(date);
+                int totalGrade = grades.stream().mapToInt(Integer::intValue).sum();
+                int meanGrade = (int) Math.round((double) totalGrade / grades.size());
+                meanGradesData.put(date, meanGrade);
+            }
+
+            // Update the line chart with the calculated mean grades
+            lineChart.updateData(meanGradesData);
+
+            // Calculate the predicted grades based on the mean grades
+            int totalMeanGrades = meanGradesData.values().stream().mapToInt(Integer::intValue).sum();
+            double predictedGrades = (totalMeanGrades / (meanGradesData.size() * 7.0));
+            predicatedGradesLabel.setText("Predicted Grades: " + (int) (predictedGrades * 7));
+
             return;
         }
 
@@ -195,7 +275,6 @@ public class Analytics {
         Hashtable<String, Integer> grades = student.grades;
 
         TreeMap<Date, Integer> gradesData = new TreeMap<>();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         for (String assignment : grades.keySet()) {
             try {
